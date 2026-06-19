@@ -32,6 +32,7 @@ namespace TaskSistem
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -55,6 +56,8 @@ namespace TaskSistem
             });
 
             var app = builder.Build();
+
+            app.UseMiddleware<TaskSistem.Middlewares.ExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
