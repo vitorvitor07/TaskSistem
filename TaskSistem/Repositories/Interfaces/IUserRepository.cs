@@ -7,5 +7,7 @@ namespace TaskSistem.Repositories.Interfaces {
         Task<UserModel> Insert(UserModel User);
         Task<UserModel> Update(UserModel User, int Id);
         Task<bool> Delete(int Id);
+        Task<UserModel> FindByEmail(string email);
+        Task<bool> EmailExists(string email);
     }
 }
