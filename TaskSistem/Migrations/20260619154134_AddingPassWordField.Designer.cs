@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskSistem.Data;
 
@@ -10,9 +11,11 @@ using TaskSistem.Data;
 namespace TaskSistem.Migrations
 {
     [DbContext(typeof(TaskSistemDBContext))]
-    partial class TaskSistemDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260619154134_AddingPassWordField")]
+    partial class AddingPassWordField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
