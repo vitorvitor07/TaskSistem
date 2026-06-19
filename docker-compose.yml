@@ -1,0 +1,19 @@
+services:
+  tasksistem:
+    image: ${DOCKER_REGISTRY-}tasksistem
+    build:
+      context: .
+      dockerfile: TaskSistem/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DataBase=Server=db;Database=TaskSistemDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
+      - JwtSettings__Secret=${JWT_SECRET}
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
