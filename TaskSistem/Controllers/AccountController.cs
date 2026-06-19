@@ -17,7 +17,6 @@ namespace TaskSistem.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
 
-
         public AccountController(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
