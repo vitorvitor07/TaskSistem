@@ -22,3 +22,5 @@ namespace TaskSistem.Data {
 
 // Migration command 
 // Add-Migration "migration-name" -Context "context-class-name"
+// Apply
+// Update-Database -Context "context-class-name"
