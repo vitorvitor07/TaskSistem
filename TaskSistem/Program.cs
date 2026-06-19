@@ -10,10 +10,6 @@ namespace TaskSistem
 {
     public class Program
     {
-        private readonly IConfiguration _configuration;
-
-
-
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -69,6 +65,21 @@ namespace TaskSistem
             app.UseAuthorization();
 
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<TaskSistemDBContext>();
+                    context.Database.Migrate();
+                    Console.WriteLine("Banco de dados inicializado e migrado com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao rodar as migrations: {ex.Message}");
+                }
+            }
 
             app.Run();
         }
