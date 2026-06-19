@@ -39,6 +39,8 @@ namespace TaskSistem.Repositories {
             _dbContext.Tasks.Update(model);
             await _dbContext.SaveChangesAsync();
 
+            model.User = task.User;
+
             return model;
         }
 

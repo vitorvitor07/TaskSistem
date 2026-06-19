@@ -31,7 +31,7 @@ namespace TaskSistem.Controllers
 
             UserModel user = await _userRepository.FindByEmail(login.Email);
 
-            if (user.Password == login.Password && user.Email == login.Email)
+            if (BCrypt.Net.BCrypt.Verify(login.Password, user.Password) && user.Email == login.Email)
             {
                 return Ok(new { accessToken = GenerateJWT($"{user.Id}") });
             }

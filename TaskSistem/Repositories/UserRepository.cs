@@ -2,6 +2,7 @@
 using TaskSistem.Data;
 using TaskSistem.Models;
 using TaskSistem.Repositories.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TaskSistem.Repositories
 {
@@ -32,10 +33,15 @@ namespace TaskSistem.Repositories
         public async Task<UserModel> Insert(UserModel user)
         {
             if (user.Email == null) throw new Exception("Email is required");
-            if (user.Password == null) throw new Exception("Email is required");
+            if (user.Password == null) throw new Exception("Password is required");
 
-            bool emailExists = await EmailExists(user.Email);
-            await _dbContext.Users.AddAsync(user);
+            bool userExists = await EmailExists(user.Email);
+
+            if (userExists) throw new Exception("Invalid email");
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
+            await _dbContext.Users.AddAsync(user) ;
             await _dbContext.SaveChangesAsync();
 
             return user;
