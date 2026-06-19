@@ -1,11 +1,7 @@
-﻿using Mapster;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TaskSistem.Dtos.User;
-using TaskSistem.DTOs.Task;
-using TaskSistem.Models;
-using TaskSistem.Repositories.Interfaces;
+using TaskSistem.Dtos.Task;
+using TaskSistem.Services.Interfaces;
 
 namespace TaskSistem.Controllers
 {
@@ -14,47 +10,63 @@ namespace TaskSistem.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        private readonly ITaskRepository _taskRepository;
+        private readonly ITaskService _taskService;
 
-        public TaskController(ITaskRepository TaskRepository)
+        public TaskController(ITaskService taskService)
         {
-            _taskRepository = TaskRepository;
+            _taskService = taskService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TaskModel>>> FindAll()
+        public async Task<ActionResult<List<TaskToResponseDto>>> FindAll()
         {
-            List<TaskModel> task = await _taskRepository.FindAll();
-            return Ok(task.Adapt<List<TaskToResponseDTO>>());
+            int userId = GetUserId();
+            var tasks = await _taskService.ListTasks(userId);
+            return Ok(tasks);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TaskModel>> FindOne([FromRoute] int id)
+        public async Task<ActionResult<TaskToResponseDto>> FindOne([FromRoute] int id)
         {
-            TaskModel task = await _taskRepository.FindOne(id);
-            return Ok(task.Adapt<TaskToResponseDTO>());
+            int userId = GetUserId();
+            var task = await _taskService.FindOne(id, userId);
+            return Ok(task);
         }
 
         [HttpPost]
-        public async Task<ActionResult<TaskModel>> Insert([FromBody] TaskModel data)
+        public async Task<ActionResult<TaskToResponseDto>> Insert([FromBody] InsertTaskDto data)
         {
-            TaskModel task = await _taskRepository.Insert(data);
-            return Ok(task.Adapt<TaskToResponseDTO>());
+            int userId = GetUserId();
+            var createdTask = await _taskService.Insert(data, userId);
+            return Ok(createdTask);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<TaskModel>> Update([FromBody] TaskModel data, [FromRoute] int id)
+        public async Task<ActionResult<TaskToResponseDto>> Update([FromRoute] int id, [FromBody] UpdateTaskDto data)
         {
-            data.Id = id;
-            TaskModel task = await _taskRepository.Update(data, id);
-            return Ok(task.Adapt<TaskToResponseDTO>());
+            int userId = GetUserId();
+            var updatedTask = await _taskService.Update(id, data, userId);
+            return Ok(updatedTask);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete([FromRoute] int id)
         {
-            bool isDeleted = await _taskRepository.Delete(id);
+            int userId = GetUserId();
+            bool isDeleted = await _taskService.Delete(id, userId);
             return Ok(new { isDeleted });
+        }
+
+        private int GetUserId()
+        {
+            var claimValue = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(claimValue))
+            {
+                throw new UnauthorizedAccessException("Usuário não identificado no Token.");
+            }
+
+            return int.Parse(claimValue);
         }
     }
 }
