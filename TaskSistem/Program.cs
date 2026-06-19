@@ -5,6 +5,8 @@ using System.Text;
 using TaskSistem.Data;
 using TaskSistem.Repositories;
 using TaskSistem.Repositories.Interfaces;
+using TaskSistem.Services;
+using TaskSistem.Services.Interfaces;
 
 namespace TaskSistem
 {
@@ -29,6 +31,7 @@ namespace TaskSistem
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddAuthentication(options =>
             {

@@ -8,7 +8,7 @@ namespace TaskSistem.Repositories.Interfaces
         Task<List<UserModel>> FindAll();
         Task<UserModel> FindOne(int Id);
         Task<UserModel> Insert(InsertUserDto data);
-        Task<UserModel> UpdateAnyUser(int Id, UpdateUserDto data);
+        Task<UserModel> Update(int Id, UpdateUserDto data);
         Task<bool> Delete(int id);
         Task<UserModel> FindByEmail(string email);
         Task<bool> EmailExists(string email);

@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TaskSistem.Data;
 using TaskSistem.Dtos.User;
 using TaskSistem.Models;
 using TaskSistem.Repositories.Interfaces;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TaskSistem.Repositories
 {
@@ -34,15 +32,6 @@ namespace TaskSistem.Repositories
 
         public async Task<UserModel> Insert(InsertUserDto data)
         {
-            if (data.Email == null) throw new Exception("Email is required");
-            if (data.Password == null) throw new Exception("Password is required");
-
-            bool userExists = await EmailExists(data.Email);
-
-            if (userExists) throw new Exception("Invalid email");
-
-            data.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
-
             var model = new UserModel
             {
                 Email = data.Email,
@@ -56,15 +45,12 @@ namespace TaskSistem.Repositories
             return model;
         }
 
-        public async Task<UserModel> UpdateAnyUser(int id, UpdateUserDto data)
+        public async Task<UserModel> Update(int id, UpdateUserDto data)
         {
-            UserModel model = await FindOne(id) ?? throw new Exception($"User with id {id} not found");
+            UserModel model = await FindOne(id);
 
-            model.Id = id;
             model.Name = data.Name;
-            model.Email = data.Email;
 
-            _dbContext.Users.Update(model);
             await _dbContext.SaveChangesAsync();
 
             return model;
@@ -72,8 +58,7 @@ namespace TaskSistem.Repositories
 
         public async Task<bool> Delete(int id)
         {
-            UserModel model = await FindOne(id) ?? throw new Exception($"User with id {id} not found");
-
+            UserModel model = await FindOne(id);
             _dbContext.Users.Remove(model);
             await _dbContext.SaveChangesAsync();
 
@@ -87,7 +72,6 @@ namespace TaskSistem.Repositories
 
         public async Task<bool> EmailExists(string email)
         {
-
             UserModel? model = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
             return model != null;
         }

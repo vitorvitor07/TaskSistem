@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskSistem.Dtos.User;
 using TaskSistem.Models;
-using TaskSistem.Repositories.Interfaces;
+using TaskSistem.Services.Interfaces;
 
 namespace TaskSistem.Controllers
 {
@@ -11,51 +11,41 @@ namespace TaskSistem.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserService userService)
         {
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<UserModel>>> FindAll()
+        public async Task<ActionResult<List<UserToResponseDto>>> FindAll()
         {
-            List<UserModel> users = await _userRepository.FindAll();
-            return Ok(users.Adapt<List<UserToResponseDto>>());
+            return Ok(await _userService.ListUsers());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserModel>> FindOne([FromRoute] int id)
         {
-            UserModel user = await _userRepository.FindOne(id);
-            return Ok(user.Adapt<UserToResponseDto>());
+            return Ok(await _userService.FindOne(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserModel>> Insert([FromBody] UserModel data)
+        public async Task<ActionResult<UserToResponseDto>> Insert([FromBody] InsertUserDto data)
         {
-            if (data.Email == null || data.Password == null)
-                return BadRequest(new { message = "Email and Password is required" });
-
-            bool userExists = await _userRepository.EmailExists(data.Email ?? "");
-            if (userExists) return BadRequest("Invalid email");
-            data.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
-            UserModel user = await _userRepository.Insert(data);
-            return Ok(user.Adapt<UserToResponseDto>());
+            return Ok(await _userService.Insert(data));
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserModel>> Update([FromBody] UserModel data, [FromRoute] int id)
+        public async Task<ActionResult<UserModel>> Update([FromBody] UpdateUserDto data, [FromRoute] int id)
         {
-            UserModel user = await _userRepository.Update(data, id);
-            return Ok(user.Adapt<UserToResponseDto>());
+            return Ok(await _userService.Update(id, data));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete([FromRoute] int id)
         {
-            bool isDeleted = await _userRepository.Delete(id);
+            bool isDeleted = await _userService.Delete(id);
             return Ok(new { isDeleted });
         }
     }

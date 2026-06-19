@@ -1,11 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TaskSistem.Dtos.User
 {
   public class InsertUserDto
   {
-    public string? Name { get; set; }
+    [StringLength(100, MinimumLength = 3)]
+    public required string Name { get; set; }
 
-    public string? Email { get; set; }
+    [EmailAddress]
+    public required string Email { get; set; }
 
-    public string? Password { get; set; }
+    [StringLength(20, MinimumLength = 6)]
+    public required string Password { get; set; }
   }
 }
