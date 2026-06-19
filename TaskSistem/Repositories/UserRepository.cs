@@ -25,7 +25,7 @@ namespace TaskSistem.Repositories
             UserModel? model = await _dbContext.Users.FindAsync(id);
             if (model == null)
             {
-                throw new Exception($"User with id {id} not found");
+                throw new KeyNotFoundException($"User with id {id} not found");
             }
             return model;
         }
@@ -67,7 +67,7 @@ namespace TaskSistem.Repositories
 
         public async Task<UserModel> FindByEmail(string email)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email) ?? throw new Exception($"User with email {email} not found");
+            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email) ?? throw new KeyNotFoundException($"User with email {email} not found");
         }
 
         public async Task<bool> EmailExists(string email)
